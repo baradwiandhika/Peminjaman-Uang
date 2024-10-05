@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Peminjaman Uang</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f7fa;
+        padding: 0;
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #333;
+        box-sizing: border-box;
+    }
+
+    #container {
+        text-align: center;
+        max-width: 400px;
+        width: 100%;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+        color: #444;
+        margin-bottom: 15px;
+        font-weight: 600;
+        font-size: 22px;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+        font-size: 14px;
+        color: #555;
+        width: 100%;
+        text-align: left;
+    }
+
+    input[type="text"], input[type="number"], select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        font-size: 14px;
+        transition: all 0.3s;
+        background-color: #f9f9f9;
+        box-sizing: border-box;
+    }
+
+    input[type="text"]:focus, input[type="number"]:focus, select:focus {
+        border-color: #007bff;
+        background-color: #fff;
+        outline: none;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+    }
+
+    input[type="submit"] {
+        background-color: #007bff;
+        color: white;
+        padding: 12px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 600;
+        transition: background-color 0.3s ease;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    input[type="submit"]:hover {
+        background-color: #0056b3;
+    }
+
+    #opsi_bunga, #opsi_tambahan {
+        margin-bottom: 15px;
+        width: 100%;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    #hasil {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #f1f3f5;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        width: 100%;
+        text-align: center;
+    }
+
+    #hasil h3 {
+        color: #007bff;
+        margin-bottom: 10px;
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    #hasil p {
+        margin: 5px 0;
+        font-size: 14px;
+        color: #555;
+    }
+
+    @media (max-width: 768px) {
+        #container {
+            padding: 20px;
+            max-width: 100%;
+        }
+
+        input[type="submit"] {
+            font-size: 13px;
+            padding: 10px;
+        }
+
+        h2 {
+            font-size: 18px;
+        }
+
+        #hasil {
+            padding: 10px;
+        }
+    }
+
+</style>
+<body>
+    <div id="container">
+        <h2>Form Peminjaman Uang</h2>
+        
+        <form id="bungaForm">
+            <label for="nama">Nama Lengkap:</label>
+            <input type="text" id="nama" name="nama" required>
+
+            <label for="jumlah_pinjaman">Jumlah Pinjaman (Rp):</label>
+            <input type="number" id="jumlah_pinjaman" name="jumlah_pinjaman" required>
+
+            <label for="jenis_bunga">Jenis Bunga:</label>
+            <select id="jenis_bunga" name="jenis_bunga" onchange="tampilkanOpsiBunga()" required>
+                <option value="tunggal">Bunga Tunggal</option>
+                <option value="majemuk">Bunga Majemuk</option>
+            </select>
+
+            <div id="opsi_bunga" class="hidden">
+                <label for="suku_bunga">Suku Bunga:</label>
+                <select id="suku_bunga" name="suku_bunga" onchange="tampilkanOpsiTambahan(); ubahLabelLamaPinjaman();" required>
+                    <option value="tahunan">Tahunan</option>
+                    <option value="bulanan">Bulanan</option>
+                </select>
+
+                <div id="opsi_tambahan" class="hidden">
+                    <label for="jenis_bunga_bulanan">Jenis Bunga Bulanan:</label>
+                    <select id="jenis_bunga_bulanan" name="jenis_bunga_bulanan" onchange="ubahLabelLamaPinjaman()">
+                        <option value="bulanan">Bulanan</option>
+                        <option value="triwulan">Triwulan</option>
+                        <option value="caturwulan">Caturwulan</option>
+                    </select>
+                </div>
+            </div>
+
+            <label for="lama_pinjaman" id="label_lama_pinjaman">Lama Pinjaman (Bulan):</label>
+            <input type="number" id="lama_pinjaman" name="lama_pinjaman" required>
+
+            <label for="bunga">Bunga (%):</label>
+            <input type="number" id="bunga" name="bunga" step="0.01" required>
+
+            <input type="submit" value="Ajukan Pinjaman">
+        </form>
+
+        <!-- Hasil berada di bawah form -->
+        <div id="hasil" class="hidden"></div>
+    </div>
+
+    <script>
+        // Fungsi untuk menampilkan opsi bunga saat halaman dimuat
+        function init() {
+            const jenisBunga = document.getElementById("jenis_bunga").value;
+            const sukuBunga = document.getElementById("suku_bunga").value;
+    
+            if (jenisBunga === "tunggal" || jenisBunga === "majemuk") {
+                document.getElementById("opsi_bunga").classList.remove("hidden");
+            }
+    
+            if (sukuBunga === "bulanan") {
+                document.getElementById("opsi_tambahan").classList.remove("hidden");
+            }
+    
+            ubahLabelLamaPinjaman();
+        }
+    
+        function tampilkanOpsiBunga() {
+            const jenisBunga = document.getElementById("jenis_bunga").value;
+            const opsiBunga = document.getElementById("opsi_bunga");
+    
+            // Tampilkan opsi bunga berdasarkan pilihan
+            if (jenisBunga === "tunggal" || jenisBunga === "majemuk") {
+                opsiBunga.classList.remove("hidden");
+            } else {
+                opsiBunga.classList.add("hidden");
+            }
+            ubahLabelLamaPinjaman(); // Update label lama pinjaman saat jenis bunga berubah
+        }
+    
+        function tampilkanOpsiTambahan() {
+            const sukuBunga = document.getElementById("suku_bunga").value;
+            const opsiTambahan = document.getElementById("opsi_tambahan");
+    
+            // Tampilkan opsi tambahan jika suku bunga bulanan dipilih
+            if (sukuBunga === "bulanan") {
+                opsiTambahan.classList.remove("hidden");
+            } else {
+                opsiTambahan.classList.add("hidden");
+            }
+            ubahLabelLamaPinjaman(); // Update label lama pinjaman saat suku bunga berubah
+        }
+    
+        function ubahLabelLamaPinjaman() {
+            const sukuBunga = document.getElementById("suku_bunga").value;
+            const jenisBungaBulanan = document.getElementById("jenis_bunga_bulanan").value;
+            const labelLamaPinjaman = document.getElementById("label_lama_pinjaman");
+    
+            if (sukuBunga === "bulanan") {
+                if (jenisBungaBulanan === "bulanan") {
+                    labelLamaPinjaman.innerHTML = "Lama Pinjaman (Bulan):";
+                } else if (jenisBungaBulanan === "triwulan") {
+                    labelLamaPinjaman.innerHTML = "Lama Pinjaman (Triwulan):";
+                } else {
+                    labelLamaPinjaman.innerHTML = "Lama Pinjaman (Caturwulan):";
+                }
+            } else {
+                labelLamaPinjaman.innerHTML = "Lama Pinjaman (Tahun):";
+            }
+        }
+    
+        document.getElementById('bungaForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+    
+            const jumlah = parseFloat(document.getElementById('jumlah_pinjaman').value);
+            const sukuBunga = parseFloat(document.getElementById('bunga').value) / 100;
+            const jenisBunga = document.getElementById('jenis_bunga').value;
+            const sukuBungaJenis = document.getElementById('suku_bunga').value;
+            let lamaPinjaman = parseFloat(document.getElementById('lama_pinjaman').value);
+            
+            // Konversi lama pinjaman ke tahun atau bulan
+            if (sukuBungaJenis === 'bulanan') {
+                if (document.getElementById('jenis_bunga_bulanan').value === 'triwulan') {
+                    lamaPinjaman *= 3; // Triwulan ke bulan
+                } else if (document.getElementById('jenis_bunga_bulanan').value === 'caturwulan') {
+                    lamaPinjaman *= 4; // Caturwulan ke bulan
+                }
+            } else {
+                lamaPinjaman /= 12; // Konversi bulan ke tahun
+            }
+    
+            let totalBunga = 0;
+            let totalBayar = 0;
+    
+            // Hitung bunga berdasarkan jenis
+            if (jenisBunga === 'tunggal') {
+                totalBunga = jumlah * sukuBunga * lamaPinjaman; // Total tahun atau bulan
+                totalBayar = jumlah + totalBunga;
+            } else if (jenisBunga === 'majemuk') {
+                totalBayar = jumlah * Math.pow((1 + sukuBunga), lamaPinjaman); // Rumus bunga majemuk
+                totalBunga = totalBayar - jumlah;
+            }
+    
+            function formatRupiah(angka) {
+                return angka.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
+            }
+    
+            document.getElementById('hasil').innerHTML = `
+                <h3>Hasil Peminjaman</h3>
+                <p>Bunga yang dihasilkan: ${formatRupiah(totalBunga)}</p>
+                <p>Total setelah ${lamaPinjaman * (sukuBungaJenis === 'bulanan' ? 1 : 12)} ${sukuBungaJenis === 'bulanan' ? 'bulan' : 'tahun'}: ${formatRupiah(totalBayar)}</p>
+            `;
+            document.getElementById('hasil').classList.remove('hidden');
+        });
+    
+        // Jalankan fungsi init saat halaman dimuat
+        window.onload = init;
+    </script>
+    
+</body>
+</html>
